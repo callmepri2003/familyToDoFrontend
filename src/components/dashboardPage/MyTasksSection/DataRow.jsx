@@ -44,7 +44,7 @@ const DataRow = ({ elements, taskId }) => {
 
     return (
         <Row onClick={() => navigate(`task/${taskId}`)}>
-            <Col md={4} style={styles}>
+            <Col md={4} style={styles} className="task-item">
                 <div style={taskStyles}>{elements[0]}</div>
             </Col>
             <Col xs={6} md={4} style={styles}>
