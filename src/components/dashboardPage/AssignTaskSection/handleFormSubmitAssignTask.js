@@ -2,19 +2,20 @@ import { assignTask } from "../../../backendInterface/api";
 
 const handleFormSubmitAssignTask = async (event, title, description, assignedTo) => {
     event.preventDefault(); 
-
+    console.log(assignedTo);
     const taskData = {
         title: title || "Untitled Task",
         description,
         status: "PE", 
         assigned_to: assignedTo,
+        assigned_from: parseInt(localStorage.getItem("userId"))
     };
 
     try {
-        const response = await assignTask(taskData);
-        console.log("Task assigned successfully:", response);
+        await assignTask(taskData);
+        alert("Task assigned successfully:");
     } catch (error) {
-        console.error("Failed to assign task:", error);
+        alert("Failed to assign task:", error);
     }
 };
 
