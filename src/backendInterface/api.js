@@ -1,13 +1,32 @@
 const apiUrl = `${import.meta.env.VITE_API_PROTOCOL}://${import.meta.env.VITE_API_HOST}/`;
-const credentials = btoa(`${import.meta.env.VITE_API_USERNAME}:${import.meta.env.VITE_API_PASSWORD}`); // Base64 encode username:password
 
-const headers = {
-  "Authorization": `Basic ${credentials}`,
-  "Content-Type": "application/json",
+function getHeaders(){
+  let credentials = null;
+  try {
+    credentials = JSON.parse(localStorage.getItem("credentials"));
+    
+    if(credentials === null){
+      throw new Error("Unauthenticated");
+    }
+  } catch (error) {
+    console.log(error);
+   window.location.href = "login";
+   return; 
+  }
+    
+  return {
+    "Authorization": `Basic ${credentials}`,
+    "Content-Type": "application/json",
+  }
 };
 
 export async function getTasks() {
-  const response = await fetch(apiUrl + "tasks/", { headers });
+  const username = localStorage.getItem("username");
+  const response = await fetch(`${apiUrl}tasks/?username=${username}`, {
+    method: "GET",
+    headers: getHeaders(),
+  });
+
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -15,7 +34,12 @@ export async function getTasks() {
 }
 
 export async function getFamilyMembers() {
-  const response = await fetch(apiUrl + "familyMembers/", { headers });
+
+  const response = await fetch(apiUrl + "familyMembers/", {
+    method: "GET",
+    headers: getHeaders()
+  });
+
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -23,7 +47,10 @@ export async function getFamilyMembers() {
 }
 
 export async function getUsers() {
-  const response = await fetch(apiUrl + "users/", { headers });
+  const response = await fetch(apiUrl + "users/", {
+    method: "GET",
+    headers: getHeaders()
+  });
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
@@ -31,11 +58,9 @@ export async function getUsers() {
 }
 
 export async function assignTask(taskData) {
-
-
   const response = await fetch(apiUrl + "tasks/assign_task/", {
     method: "POST",
-    headers,
+    headers: getHeaders(), // Use "headers" key
     body: JSON.stringify(taskData),
   });
 
@@ -46,11 +71,10 @@ export async function assignTask(taskData) {
   return await response.json();
 }
 
-
 export async function acceptTask(taskId) {
   const response = await fetch(`${apiUrl}tasks/${taskId}/accept_task/`, {
     method: "GET",
-    headers,
+    headers: getHeaders(), // Use "headers" key
   });
 
   if (!response.ok) {
@@ -63,7 +87,7 @@ export async function acceptTask(taskId) {
 export async function rejectTask(taskId) {
   const response = await fetch(`${apiUrl}tasks/${taskId}/reject_task/`, {
     method: "GET",
-    headers,
+    headers: getHeaders(), // Use "headers" key
   });
 
   if (!response.ok) {
@@ -76,7 +100,7 @@ export async function rejectTask(taskId) {
 export async function completeTask(taskId) {
   const response = await fetch(`${apiUrl}tasks/${taskId}/complete_task/`, {
     method: "GET",
-    headers,
+    headers: getHeaders(), // Use "headers" key
   });
 
   if (!response.ok) {

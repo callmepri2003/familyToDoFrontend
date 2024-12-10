@@ -8,7 +8,7 @@ const MyTasksContainer = ({tasks}) => {
         <Section>
             <Heading1>My tasks</Heading1>
                 {tasks.map((element, index)=>(
-                    <DataRow key={index} taskId={element.id} elements={[element.title, element.assigned_to, element.status]}></DataRow>
+                    <DataRow key={index} taskId={element.id} elements={[element.title, element.assigned_from, element.status]}></DataRow>
                 ))
                 }
         </Section>

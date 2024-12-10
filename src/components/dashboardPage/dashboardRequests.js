@@ -3,43 +3,44 @@ import { getFamilyMembers, getTasks } from '../../backendInterface/api';
 export async function updateDashboard(setters) {
     const { setRemainingTasks, setPendingTasks } = setters;
 
-    getRemainingTasks().then((response) => {
-        setRemainingTasks(response);
+    let allTasks = await getTasks().then((response) => {
+        return response;
     });
 
-    getPendingTasks().then((response) => {
-        setPendingTasks(response);
-    });
+    let familyMembers = await getFamilyMembers().then((familyMembers)=>(familyMembers));
+
+    setRemainingTasks(await getRemainingTasks(allTasks, familyMembers));
+
+    setPendingTasks(await getPendingTasks(allTasks, familyMembers));
 }
 
-export async function getRemainingTasks() {
-    const tasks = await getTasks().then((response) => {
-        return response.filter(element => element.status.toUpperCase() === "AC");
-    });
 
-    await getFamilyMembers().then((familyMembers) => {
-        tasks.forEach((task) => {
-            const familyMember = familyMembers.find(familyMember => familyMember.id === task.assigned_to);
+export async function getRemainingTasks(tasks, familyMembers) {
+    let response = tasks.filter(element => element.status.toUpperCase() === "AC");
+
+    response.forEach((task) => {
+            let familyMember = familyMembers.find(familyMember => familyMember.id === task.assigned_to);
             task.assigned_to = familyMember.first_name;
-        });
+            
+            familyMember = familyMembers.find(familyMember => familyMember.id === task.assigned_from);
+            task.assigned_from = familyMember.first_name;
     });
 
-    return tasks;
+    return response;
 }
 
-export async function getPendingTasks() {
-    const tasks = await getTasks().then((response) => {
-        return response.filter(element => element.status.toUpperCase() === "PE");
-    });
+export async function getPendingTasks(tasks, familyMembers) {
+    let response = tasks.filter(element => element.status.toUpperCase() === "PE");
 
-    await getFamilyMembers().then((familyMembers) => {
-        tasks.forEach((task) => {
-            const familyMember = familyMembers.find(familyMember => familyMember.id === task.assigned_to);
+    response.forEach((task) => {
+            let familyMember = familyMembers.find(familyMember => familyMember.id === task.assigned_to);
             task.assigned_to = familyMember.first_name;
-        });
+
+            familyMember = familyMembers.find(familyMember => familyMember.id === task.assigned_from);
+            task.assigned_from = familyMember.first_name;
     });
 
-    return tasks;
+    return response;
 }
 
 export async function getFamilyMembersAssignTaskSection(){
